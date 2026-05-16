@@ -9,29 +9,46 @@ function App() {
   const [activeTab, setActiveTab] = useState('Tests & Quizzes');
   const [isModalOpen, setIsModalOpen] = useState(false);
   
-  // Initial demo data
-  const [tasks, setTasks] = useState([
-    {
-      id: 1,
-      title: 'AP Physics Midterm',
-      type: 'Test',
-      dueDate: new Date(new Date().setDate(new Date().getDate() + 2)).toISOString().split('T')[0]
-    },
-    {
-      id: 2,
-      title: 'History Essay Outline',
-      type: 'Homework',
-      dueDate: new Date(new Date().setDate(new Date().getDate() + 1)).toISOString().split('T')[0]
-    },
-    {
-      id: 3,
-      title: 'Math Worksheet 4.2',
-      type: 'Homework',
-      dueDate: new Date().toISOString().split('T')[0]
-    }
-  ]);
+  // Initialize from localStorage or defaults
+  const [tasks, setTasks] = useState(() => {
+    const saved = localStorage.getItem('focus_tasks');
+    if (saved) return JSON.parse(saved);
+    return [
+      {
+        id: 1,
+        title: 'AP Physics Midterm',
+        type: 'Test',
+        dueDate: new Date(new Date().setDate(new Date().getDate() + 2)).toISOString().split('T')[0]
+      },
+      {
+        id: 2,
+        title: 'History Essay Outline',
+        type: 'Homework',
+        dueDate: new Date(new Date().setDate(new Date().getDate() + 1)).toISOString().split('T')[0]
+      },
+      {
+        id: 3,
+        title: 'Math Worksheet 4.2',
+        type: 'Homework',
+        dueDate: new Date().toISOString().split('T')[0]
+      }
+    ];
+  });
 
-  const [completedTasksCount, setCompletedTasksCount] = useState(0);
+  const [completedTasksCount, setCompletedTasksCount] = useState(() => {
+    const saved = localStorage.getItem('focus_completed_count');
+    return saved ? parseInt(saved, 10) : 0;
+  });
+
+  // Persist to localStorage
+  useEffect(() => {
+    localStorage.setItem('focus_tasks', JSON.stringify(tasks));
+  }, [tasks]);
+
+  useEffect(() => {
+    localStorage.setItem('focus_completed_count', completedTasksCount.toString());
+  }, [completedTasksCount]);
+
 
   const getFilteredTasks = () => {
     if (activeTab === 'Tests & Quizzes') {
